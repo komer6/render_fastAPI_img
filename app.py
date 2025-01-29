@@ -32,13 +32,22 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Configure CORS (allow specific domains to make requests)
+# Configure CORS (allow specific domains to make requests)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:5500","http://127.0.0.1:5500/add-dog.html","http://127.0.0.1:5500/index.html"],  # Allow both origins
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:5500",
+        "http://127.0.0.1:5500/add-dog.html",
+        "http://127.0.0.1:5500/index.html",
+        "https://komer6.github.io/render_fastAPI_images/",
+        "https://komer6.github.io/render_fastAPI_images/add_dog.html"
+    ],  # Allow both origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Pydantic model for Dog
 class DogCreate(BaseModel):
