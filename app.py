@@ -28,23 +28,23 @@ Base.metadata.create_all(bind=engine)
 
 # FastAPI app
 app = FastAPI()
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  
-        "https://helpful-salamander-85e73b.netlify.app", 
-    ],
+    allow_origins=["http://127.0.0.1:5500"],  # or "*", but not recommended for production
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
-# Ensure the uploads directory exists
-UPLOAD_FOLDER = "/persistent/uploads"  # Persistent folder on Render
+UPLOAD_FOLDER = "uploads"  # Local folder for images
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
 
 # Dependency to get DB session
 def get_db():
@@ -63,16 +63,20 @@ async def create_dog(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    # Generate a unique filename
     unique_filename = f"{uuid.uuid4()}.{file.filename.split('.')[-1]}"
     file_location = os.path.join(UPLOAD_FOLDER, unique_filename)
 
-    # Save the uploaded file
+    # Save file
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Store in database
-    db_dog = Dog(name=name, breed=breed, color=color, photo=f"/uploads/{unique_filename}")
+    # Store in DB with correct image URL
+    db_dog = Dog(
+        name=name,
+        breed=breed,
+        color=color,
+        photo=f"http://127.0.0.1:8000/uploads/{unique_filename}"
+    )
     db.add(db_dog)
     db.commit()
     db.refresh(db_dog)
@@ -82,8 +86,9 @@ async def create_dog(
         "name": db_dog.name,
         "breed": db_dog.breed,
         "color": db_dog.color,
-        "photo": db_dog.photo,
+        "photo": db_dog.photo
     }
+
 
 # Serve uploaded images
 @app.get("/uploads/{filename}")
