@@ -35,7 +35,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],  # or "*", but not recommended for production
+    allow_origins=["http://127.0.0.1:5500","https://incomparable-starburst-0415bc.netlify.app"],  # or "*", but not recommended for production
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
