@@ -1,5 +1,5 @@
 fastapi==0.100.0
 uvicorn==0.21.0
 sqlalchemy==2.0.20
-pydantic==1.11.0
+pydantic==2.10.6
 aiofiles==23.1.0
